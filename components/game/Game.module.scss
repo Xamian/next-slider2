@@ -22,8 +22,8 @@
 .button {
   display: block;
   width: 100vw;
-  min-height: 5vw;
-  margin-top: 1vw;
+  min-height: 10vw;
+  margin-top: 2vw;
 }
 @media (min-width: 600px) {
   .game {
@@ -39,7 +39,7 @@
   }
   .button {
     width: 600px;
-    min-height: 30px;
-    margin-top: 5px;
+    min-height: 60px;
+    margin-top: 10px;
   }
 }
