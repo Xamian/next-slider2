@@ -1,0 +1,45 @@
+.game {
+  .board-wrapper {
+    width: 100vw;
+    height: 100vw;
+  }
+  .score {
+    font-size: large;
+  }
+  .message {
+    font-size: 10vw;
+    line-height: 13vw;
+    margin-top: -6vw;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    text-align: center;
+    color: rgb(224, 224, 224);
+    text-shadow: 2px 2px 5px black;
+  }
+}
+.button {
+  display: block;
+  width: 100vw;
+  min-height: 5vw;
+  margin-top: 1vw;
+}
+@media (min-width: 600px) {
+  .game {
+    .board-wrapper {
+      width: 600px;
+      height: 600px;
+    }
+    .message {
+      font-size: 60px;
+      line-height: 77px;
+      margin-top: -36px;
+    }
+  }
+  .button {
+    width: 600px;
+    min-height: 30px;
+    margin-top: 5px;
+  }
+}

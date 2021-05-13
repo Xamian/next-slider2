@@ -1,0 +1,19 @@
+.board {
+  position: relative;
+  background-color: #ddd;
+  width: 100%;
+  height: 100%;
+  .piece {
+    position: absolute;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-clip: content-box;
+    transition: all 0.5s ease;
+    padding: 1px;
+    border-radius: 10%;
+  }
+  &.playing {
+    .piece {
+    }
+  }
+}
