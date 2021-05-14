@@ -5,13 +5,15 @@ import { dataUrlFromImgUrl } from "../../common/imageUtil"
 import { Piece } from "./board/board"
 import { range } from "../../common/range"
 import styles from './Game.module.scss'
+import { findBestMove } from "../../common/ai"
+import { getPieceAtPos, delay } from "../../common/common"
 
 
 export const Game = () => {
   // const canvasRef = useRef(null)
   // const imgEl = useRef(null)
-  const [numPiecesX, setNumPiecesX] = useState(3)
-  const [numPiecesY, setNumPiecesY] = useState(3)
+  const [W, setW] = useState(3)
+  const [H, setH] = useState(3)
   const [imgDataUrl, setImgDataUrl] = useState('')
   const [counter, setCounter] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -20,11 +22,12 @@ export const Game = () => {
   const [message, setMessageText] = useState('Press start to begin')
   const [messageOpacity, setMessageOpacity] = useState(1)
   const [messageHidden, setMessageHidden] = useState(false)
+  const [hintId, setHintId] = useState(NaN)
   useEffect(() => {
-    setPieces(range(0, numPiecesX * numPiecesY).map(i => (
-      new Piece(new Vector2d(i % numPiecesX, Math.floor(i / numPiecesY)), i)
+    setPieces(range(0, W * H).map(i => (
+      new Piece(new Vector2d(i % W, Math.floor(i / H)), i)
     )))
-  }, [numPiecesX, numPiecesY])
+  }, [W, H])
   const showMessage = (text: string) => {
     setMessageText(text)
     setMessageOpacity(1)
@@ -48,6 +51,18 @@ export const Game = () => {
     // setTimeout(() => hideMessage(), 1000)
     // setIsPlaying(true)
   }
+  const onHintClick = () => {
+    const [bestWeight, bestMove] = findBestMove(pieces, W,H);
+    // if (bestMove) {
+    //   showHint(bestMove.index)
+    // } else {
+    //   console.log('no best move found!')
+    // }
+  }
+  const showHint = (index: number) => {
+    setHintId(index);
+  }
+  const removeHint = () => setHintId(NaN)
   const startGame = async () => {
     setScore(0)
     showMessage('Good luck!')
@@ -59,7 +74,8 @@ export const Game = () => {
 
     /// shuffle pieces
     //shufflePieces(25)
-    await betterShuffle(numPiecesX, numPiecesY)
+    await betterShuffle(W, H)
+    // await betterShuffle(numPiecesX, numPiecesY, 1, false, 0)
 
     /// make sure the ui is updated
     setPieces([...pieces])
@@ -99,31 +115,21 @@ export const Game = () => {
 
         }
         const selectedMove = neighborPositions[Math.floor(Math.random() * neighborPositions.length)]
-        const piece = getPieceAtPos(selectedMove)
+        const piece = getPieceAtPos(pieces, selectedMove)
         prevHidden = hiddenPiece.currentPos
         swap(piece, hiddenPiece)
         touched[piece.index] = 1
-      } while (calcDif() < minDif || (mustTouchAll && Object.keys(touched).length + 1 < pieces.length))
+      } while (calcDif(pieces) < minDif || (mustTouchAll && Object.keys(touched).length + 1 < pieces.length))
       // setDif(calcDif())
       /// make sure the ui is updated
       setPieces([...pieces])
       await delay(200)
     }
   }
-  const calcDif = () => pieces.reduce((acc: number, piece: Piece) => {
+  const calcDif = (pieces: Piece[]) => pieces.reduce((acc: number, piece: Piece) => {
     acc += piece.currentPos.simpleDif(piece.startPos)
     return acc
   }, 0)
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-  const getPieceAtPos = (pos: Vector2d) => {
-    for (let i = 0; i < pieces.length; i++) {
-      const piece = pieces[i];
-      const cPos = piece.currentPos
-      if (cPos.x == pos.x && cPos.y == pos.y)
-        return piece
-    }
-  }
-
 
   const onBoardClick = (event: MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement
@@ -150,14 +156,14 @@ export const Game = () => {
     }
   }
   const checkWin = () => {
-    if (isWin()) {
+    if (isWin(pieces)) {
       const hiddenPiece = pieces[pieces.length - 1]
       // setTimeout(() => hiddenPiece.hidden = false, 1500)
       showMessage(`Player wins in ${score + 1} moves!`)
       setTimeout(() => setIsPlaying(false), 500)
     }
   }
-  const isWin = () => {
+  const isWin = (pieces: Piece[]) => {
     for (let i = 0; i < pieces.length; i++) {
       const piece = pieces[i];
       const cPos = piece.currentPos
@@ -192,10 +198,11 @@ export const Game = () => {
           // dimensions={new Vector2d(300, 300)}
           pieces={pieces}
           imgDataUrl={imgDataUrl}
-          numPiecesX={numPiecesX}
-          numPiecesY={numPiecesY}
+          numPiecesX={W}
+          numPiecesY={H}
           isPlaying={isPlaying}
           onClick={onBoardClick}
+          hintId={hintId}
         >
           <div className={styles.message} style={{ opacity: messageOpacity, display: messageHidden ? 'none' : 'block' }}>{message}</div>
         </Board>
@@ -203,6 +210,7 @@ export const Game = () => {
       {/* <img src={imgUrl} width="100" />
       <img src={imgDataUrl} width="200" /> */}
       <button className={styles.button} onClick={onStartClick}>Start</button>
+      <button className={styles.button} onClick={onHintClick}>Hint</button>
       <button className={styles.button} onClick={() => setCounter(counter + 1)}>New Image</button>
     </div >
   )

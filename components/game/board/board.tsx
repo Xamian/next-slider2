@@ -31,6 +31,7 @@ interface IBoardProps {
   isPlaying?: boolean;
   onClick?: IClickFunc;
   children?: React.ReactNode;
+  hintId?: number;
   // [x: string]: any;
 }
 export const Board = (props: IBoardProps) => {
@@ -42,7 +43,8 @@ export const Board = (props: IBoardProps) => {
     numPiecesY = 3,
     isPlaying = false,
     children,
-    onClick
+    onClick,
+    hintId
     /*, ...rest*/
   } = props;
   useEffect(() => {
@@ -64,7 +66,8 @@ export const Board = (props: IBoardProps) => {
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,
           backgroundImage: `url(${imgDataUrl})`,
           backgroundSize: `${100 * numPiecesX}%`,
-          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`
+          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`,
+          outline: i === hintId ? `1px solid green` : ''
         }}
         data-piece-index={i}
       ></div>
