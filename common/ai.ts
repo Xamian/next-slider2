@@ -28,13 +28,15 @@ function getSimplifiedBoard(pieces: Piece[]): number[] {
 function getLegalMoves(board: number[]): number[] {
   let legalMoves = []
   const emptyPos = board.indexOf(8)
-  if (emptyPos % W > 0)
-    legalMoves.push(emptyPos - 1)
-  if (emptyPos % W < (W - 1))
-    legalMoves.push(emptyPos + 1)
-  if (Math.floor(emptyPos / W) > 0)
+  const x = emptyPos % W
+  const y = Math.floor(emptyPos / W)
+  if (y > 0)
     legalMoves.push(emptyPos - W)
-  if (Math.floor(emptyPos / W) < (H - 1))
+  if (x > 0)
+    legalMoves.push(emptyPos - 1)
+  if (x < (W - 1))
+    legalMoves.push(emptyPos + 1)
+  if (y < (H - 1))
     legalMoves.push(emptyPos + W)
   return legalMoves
 }
@@ -42,23 +44,38 @@ class SearchState {
   board: number[]
   legalMoves: number[]
   constructor(board: number[]) {
-    this.board = board
+    /// clone the board
+    this.board = [...board]
     this.legalMoves = getLegalMoves(board)
   }
-  private calculateDistance(pos: number, index: number): number {
-    const wanted = new Vector2d(pos % W, Math.floor(pos / W))
-    const current = new Vector2d(index % W, Math.floor(index / W))
+  private calculateDistance(wantedIndex: number, currentIndex: number): number {
+    const wanted = new Vector2d(wantedIndex % W, Math.floor(wantedIndex / W))
+    const current = new Vector2d(currentIndex % W, Math.floor(currentIndex / W))
     return wanted.simpleDif(current)
   }
 
   score() {
-    return this.board.reduce((acc, curr, i) => {
-      if (curr < W * H - 1) /// Ignore hidden piece
-        acc += this.calculateDistance(curr, i)
+    return this.board.reduce((acc, wantedIndex, currentIndex) => {
+      if (wantedIndex < W * H - 1) /// Ignore hidden piece
+        acc += this.calculateDistance(wantedIndex, currentIndex)
       return acc
     }, 0)
   }
+  move(boardIndex: number) {
+    console.log('move from index:', boardIndex)
+    const temp = this.board[boardIndex]
+    const emptyPos = this.board.indexOf(W * H - 1)
 
+    this.board[emptyPos] = temp
+    this.board[boardIndex] = W * H - 1
+    this.legalMoves = getLegalMoves(this.board)
+    return this
+  }
+  getLegalPositions() {
+    return this.legalMoves.map(boardIndex => {
+      return new SearchState(this.board).move(boardIndex)
+    })
+  }
 }
 
 export function findBestMove(pieces: Piece[], w: number, h: number) {
@@ -66,10 +83,11 @@ export function findBestMove(pieces: Piece[], w: number, h: number) {
   H = h
   const simplifiedBoard: number[] = getSimplifiedBoard(pieces)
   let rootState = new SearchState(simplifiedBoard)
-  console.log(rootState.board)
-  console.log(rootState.legalMoves)
-  console.log(rootState.score())
-
+  console.log('board:', rootState.board)
+  console.log('legalMoves:', rootState.legalMoves)
+  console.log('score:', rootState.score())
+  let positions = rootState.getLegalPositions()
+  console.log(positions)
   const maxDepth = 3
   for (let i = 0; i < maxDepth; i++) {
   }

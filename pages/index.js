@@ -20,7 +20,7 @@ export default function Home() {
         <a
           href="https://max-it.dk/"
           target="_blank"
-        >max-it.dk</a>
+        >max-it.dk</a>&nbsp;- Image from&nbsp;<a href="https://thispersondoesnotexist.com">thispersondoesnotexist.com</a>
       </footer>
     </div>
   )
