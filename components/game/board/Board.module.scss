@@ -1,6 +1,6 @@
 .board {
   position: relative;
-  background-color: #ddd;
+  // background-color: #ddd;
   width: 100%;
   height: 100%;
   .piece {
@@ -8,12 +8,21 @@
     background-color: #fff;
     background-repeat: no-repeat;
     background-clip: content-box;
-    transition: all 0.5s ease;
-    padding: 1px;
-    border-radius: 10%;
+    transition: padding 1s, border-radius 3s, left 1s cubic-bezier(0.65, 0.05, 0.36, 1),
+      top 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), outline-color 1s;
+    padding: 0px;
+    border-radius: 0%;
+    outline: 5px solid rgba(64, 64, 128, 0);
+    outline-offset: -5px;
+    &.hint {
+      outline-width: 5px;
+      outline-color: rgb(64, 179, 255);
+    }
   }
   &.playing {
     .piece {
+      border-radius: 10%;
+      padding: 1px;
     }
   }
 }

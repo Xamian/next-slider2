@@ -88,7 +88,7 @@ export const Game = () => {
     setIsPlaying(true)
   }
 
-  const betterShuffle = async (numPiecesX: number, numPiecesY: number, iterations: number = 5, mustTouchAll: boolean = true, minDif: number = 20) => {
+  const betterShuffle = async (numPiecesX: number, numPiecesY: number, iterations: number = 1, mustTouchAll: boolean = true, minDif: number = 20) => {
     const hiddenPiece = pieces[pieces.length - 1]
     let prevHidden: Vector2d
     const W = numPiecesX

@@ -43,7 +43,8 @@ export const Board = (props: IBoardProps) => {
       const y = piece.currentPos.y;
       return <div
         key={i}
-        className={styles.piece}
+        className={styles.piece +
+          (x + y * 3 === hintId ? ` ${styles.hint}` : '')}
         style={{
           width: `${pieceDim.x}%`,
           height: `${pieceDim.y}%`,
@@ -52,8 +53,7 @@ export const Board = (props: IBoardProps) => {
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,
           backgroundImage: `url(${imgDataUrl})`,
           backgroundSize: `${100 * numPiecesX}%`,
-          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`,
-          outline: x + y * 3 === hintId ? `2px solid green` : ''
+          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`
         }}
         data-piece-index={i}
       ></div>

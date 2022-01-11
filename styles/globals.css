@@ -9,3 +9,9 @@ body {
 * {
   box-sizing: border-box;
 }
+
+@media (prefers-reduced-motion) {
+  * {
+    transition: none !important;
+  }
+}

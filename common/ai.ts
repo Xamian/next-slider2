@@ -1,32 +1,18 @@
 import { Piece } from "../components/game/board/Piece";
-import { Board } from "../components/game/board";
+import Denque from "denque";
 
 const W = 3;
 const H = 3;
 const positionCount = W * H;
-const emptyPieceIndex = positionCount - 1; // 8
-const winningBoard = [...Array(positionCount)].map((_, k) => k); // 0,1,2...,8
-
-function calcHash(board: number[]): number {
-  const m1 = board.map((p, k) => {
-    return p * Math.pow(10, positionCount - 1 - k)
-  });
-  const r1 = m1.reduce((acc, cur) => {
-    acc += cur;
-    return acc;
-  });
-  return r1;
-}
+const emptyPieceIndex = (positionCount - 1).toString(); // '8'
+const winningBoard = [...Array(positionCount)].map((_, k) => k.toString()); // '0','1','2'...,'8'
 
 class Node {
-  hash: number; // 12345678 - 876543210
   children: Node[];
-  constructor(public board: number[], public parent: Node = null) {
-    this.hash = calcHash(board)
+  hash: string;
+  constructor(public board: string[], public parent: Node = null) {
+    this.hash = board.join('');
   }
-  // getEmptyPos(): number {
-  //   return this.board.indexOf(emptyPieceIndex);
-  // }
 }
 
 function findLegalMovesFromPos(emptyPos: number): number[] {
@@ -42,56 +28,50 @@ function findLegalMovesFromPos(emptyPos: number): number[] {
     legalMoves.push(emptyPos + W)
   return legalMoves
 }
-function findLegalMoves(board: number[]): number[] {
+function findLegalMoves(board: string[]): number[] {
   const emptyPos = board.indexOf(emptyPieceIndex)
   return findLegalMovesFromPos(emptyPos)
 }
 
-function move(board: number[], aMove: number) {
-  const newBoard = [...board]
+function move(board: string[], aMove: number): string[] {
+  const newBoard = board.slice();
   const emptyPos = newBoard.indexOf(emptyPieceIndex)
   newBoard[emptyPos] = board[aMove]
   newBoard[aMove] = emptyPieceIndex
   return newBoard
 }
 
-const doneHashes = new Map<number, Node>();
-const rootNode = new Node(winningBoard);
+const nodeCache = new Map<string, Node>();
 
 function prepare() {
-  const work: Node[] = [];
-
-  // work.push(rootNode.board);
-  work.push(rootNode);
+  const work = new Denque<Node>();
+  work.push(new Node(winningBoard));
 
   while (work.length > 0) {
-    // const board = work.shift();
-    const node: Node = work.shift();
-    // const hash = Node.calcHash(board);
+    const node = work.shift();
     const hash = node.hash;
-    if (!doneHashes.has(hash)) {
+    if (!nodeCache.has(hash)) {
       const legalMoves = findLegalMoves(node.board);
       const positions = legalMoves.map(aMove => move(node.board, aMove));
       node.children = positions.map(position => new Node(position, node));
-      work.push(...node.children);
-      doneHashes.set(hash, node);
+      node.children.forEach(child => {
+        work.push(child);
+      });
+      nodeCache.set(hash, node);
     }
   }
-
-  console.info({ rootNode });
 }
 
-// export function findBestMove(pieces: Piece[], W: number, H: number) {
-export function findBestMove(board: number[]): number {
-  console.time()
+export function findBestMove(board: string): number {
+  // console.time()
   prepare();
-  console.timeEnd()
-  const hash = calcHash(board);
-  const node = doneHashes.get(hash);
+  // console.timeEnd()
+  const hash = board;
+  const node = nodeCache.get(hash);
   return node.parent ? node.parent.board.indexOf(emptyPieceIndex) : -1;
 }
 
-export function getSimplifiedBoard(pieces: Piece[]): number[] {
+export function getSimplifiedBoard(pieces: Piece[]): string {
   function sortByPosition(a: Piece, b: Piece): number {
     const aPos = a.currentPos
     const bPos = b.currentPos
@@ -105,9 +85,10 @@ export function getSimplifiedBoard(pieces: Piece[]): number[] {
     }
     return 1
   }
-  return pieces
+  return [...pieces]
     /// Note: Array.prototype.sort is destructive,
     /// so copy original array before sorting  
-    .slice().sort(sortByPosition)
+    .sort(sortByPosition)
     .map((piece) => piece.index)
+    .join('')
 }
