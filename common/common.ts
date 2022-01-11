@@ -1,5 +1,5 @@
 import { Vector2d } from "./vector2d";
-import { Piece } from "../components/game/board/board";
+import { Piece } from "../components/game/board/Piece";
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 

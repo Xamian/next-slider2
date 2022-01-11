@@ -1,10 +1,97 @@
-import { Piece } from "../components/game/board/board"
-import { Vector2d } from "./vector2d"
+import { Piece } from "../components/game/board/Piece";
+import { Board } from "../components/game/board";
 
-let W: number
-let H: number
+const W = 3;
+const H = 3;
+const positionCount = W * H;
+const emptyPieceIndex = positionCount - 1; // 8
+const winningBoard = [...Array(positionCount)].map((_, k) => k); // 0,1,2...,8
 
-function getSimplifiedBoard(pieces: Piece[]): number[] {
+function calcHash(board: number[]): number {
+  const m1 = board.map((p, k) => {
+    return p * Math.pow(10, positionCount - 1 - k)
+  });
+  const r1 = m1.reduce((acc, cur) => {
+    acc += cur;
+    return acc;
+  });
+  return r1;
+}
+
+class Node {
+  hash: number; // 12345678 - 876543210
+  children: Node[];
+  constructor(public board: number[], public parent: Node = null) {
+    this.hash = calcHash(board)
+  }
+  // getEmptyPos(): number {
+  //   return this.board.indexOf(emptyPieceIndex);
+  // }
+}
+
+function findLegalMovesFromPos(emptyPos: number): number[] {
+  let legalMoves = []
+  const x = emptyPos % W
+  if (emptyPos > W)
+    legalMoves.push(emptyPos - W)
+  if (x > 0)
+    legalMoves.push(emptyPos - 1)
+  if (x < (W - 1))
+    legalMoves.push(emptyPos + 1)
+  if (emptyPos < 9 - W)
+    legalMoves.push(emptyPos + W)
+  return legalMoves
+}
+function findLegalMoves(board: number[]): number[] {
+  const emptyPos = board.indexOf(emptyPieceIndex)
+  return findLegalMovesFromPos(emptyPos)
+}
+
+function move(board: number[], aMove: number) {
+  const newBoard = [...board]
+  const emptyPos = newBoard.indexOf(emptyPieceIndex)
+  newBoard[emptyPos] = board[aMove]
+  newBoard[aMove] = emptyPieceIndex
+  return newBoard
+}
+
+const doneHashes = new Map<number, Node>();
+const rootNode = new Node(winningBoard);
+
+function prepare() {
+  const work: Node[] = [];
+
+  // work.push(rootNode.board);
+  work.push(rootNode);
+
+  while (work.length > 0) {
+    // const board = work.shift();
+    const node: Node = work.shift();
+    // const hash = Node.calcHash(board);
+    const hash = node.hash;
+    if (!doneHashes.has(hash)) {
+      const legalMoves = findLegalMoves(node.board);
+      const positions = legalMoves.map(aMove => move(node.board, aMove));
+      node.children = positions.map(position => new Node(position, node));
+      work.push(...node.children);
+      doneHashes.set(hash, node);
+    }
+  }
+
+  console.info({ rootNode });
+}
+
+// export function findBestMove(pieces: Piece[], W: number, H: number) {
+export function findBestMove(board: number[]): number {
+  console.time()
+  prepare();
+  console.timeEnd()
+  const hash = calcHash(board);
+  const node = doneHashes.get(hash);
+  return node.parent ? node.parent.board.indexOf(emptyPieceIndex) : -1;
+}
+
+export function getSimplifiedBoard(pieces: Piece[]): number[] {
   function sortByPosition(a: Piece, b: Piece): number {
     const aPos = a.currentPos
     const bPos = b.currentPos
@@ -23,73 +110,4 @@ function getSimplifiedBoard(pieces: Piece[]): number[] {
     /// so copy original array before sorting  
     .slice().sort(sortByPosition)
     .map((piece) => piece.index)
-}
-
-function getLegalMoves(board: number[]): number[] {
-  let legalMoves = []
-  const emptyPos = board.indexOf(8)
-  const x = emptyPos % W
-  const y = Math.floor(emptyPos / W)
-  if (y > 0)
-    legalMoves.push(emptyPos - W)
-  if (x > 0)
-    legalMoves.push(emptyPos - 1)
-  if (x < (W - 1))
-    legalMoves.push(emptyPos + 1)
-  if (y < (H - 1))
-    legalMoves.push(emptyPos + W)
-  return legalMoves
-}
-class SearchState {
-  board: number[]
-  legalMoves: number[]
-  constructor(board: number[]) {
-    /// clone the board
-    this.board = [...board]
-    this.legalMoves = getLegalMoves(board)
-  }
-  private calculateDistance(wantedIndex: number, currentIndex: number): number {
-    const wanted = new Vector2d(wantedIndex % W, Math.floor(wantedIndex / W))
-    const current = new Vector2d(currentIndex % W, Math.floor(currentIndex / W))
-    return wanted.simpleDif(current)
-  }
-
-  score() {
-    return this.board.reduce((acc, wantedIndex, currentIndex) => {
-      if (wantedIndex < W * H - 1) /// Ignore hidden piece
-        acc += this.calculateDistance(wantedIndex, currentIndex)
-      return acc
-    }, 0)
-  }
-  move(boardIndex: number) {
-    console.log('move from index:', boardIndex)
-    const temp = this.board[boardIndex]
-    const emptyPos = this.board.indexOf(W * H - 1)
-
-    this.board[emptyPos] = temp
-    this.board[boardIndex] = W * H - 1
-    this.legalMoves = getLegalMoves(this.board)
-    return this
-  }
-  getLegalPositions() {
-    return this.legalMoves.map(boardIndex => {
-      return new SearchState(this.board).move(boardIndex)
-    })
-  }
-}
-
-export function findBestMove(pieces: Piece[], w: number, h: number) {
-  W = w
-  H = h
-  const simplifiedBoard: number[] = getSimplifiedBoard(pieces)
-  let rootState = new SearchState(simplifiedBoard)
-  console.log('board:', rootState.board)
-  console.log('legalMoves:', rootState.legalMoves)
-  console.log('score:', rootState.score())
-  let positions = rootState.getLegalPositions()
-  console.log(positions)
-  const maxDepth = 3
-  for (let i = 0; i < maxDepth; i++) {
-  }
-  return [null, null]
 }

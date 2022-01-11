@@ -1,11 +1,11 @@
 import { Vector2d } from "../../common/vector2d"
 import { Board } from "./board"
+import { Piece } from "./board/Piece"
 import { useState, useRef, SyntheticEvent, useEffect, MouseEvent } from "react"
 import { dataUrlFromImgUrl } from "../../common/imageUtil"
-import { Piece } from "./board/board"
 import { range } from "../../common/range"
 import styles from './Game.module.scss'
-import { findBestMove } from "../../common/ai"
+import { findBestMove, getSimplifiedBoard } from "../../common/ai"
 import { getPieceAtPos, delay } from "../../common/common"
 
 
@@ -22,7 +22,7 @@ export const Game = () => {
   const [message, setMessageText] = useState('Press start to begin')
   const [messageOpacity, setMessageOpacity] = useState(1)
   const [messageHidden, setMessageHidden] = useState(false)
-  const [hintId, setHintId] = useState(NaN)
+  const [hintId, setHintId] = useState(-1)
   useEffect(() => {
     setPieces(range(0, W * H).map(i => (
       new Piece(new Vector2d(i % W, Math.floor(i / H)), i)
@@ -52,9 +52,14 @@ export const Game = () => {
     // setIsPlaying(true)
   }
   const onHintClick = () => {
-    const [bestWeight, bestMove] = findBestMove(pieces, W,H);
-    // if (bestMove) {
-    //   showHint(bestMove.index)
+    // const [bestWeight, bestMove] = findBestMove(pieces, W, H);
+    // findBestMove(board: number[]): number
+
+    const board = getSimplifiedBoard(pieces);
+    const bestMove = findBestMove(board);
+
+    // if (bestMove > -1) {
+    showHint(bestMove)
     // } else {
     //   console.log('no best move found!')
     // }
@@ -65,6 +70,7 @@ export const Game = () => {
   const removeHint = () => setHintId(NaN)
   const startGame = async () => {
     setScore(0)
+    setHintId(-1)
     showMessage('Good luck!')
     setTimeout(() => hideMessage(), 1000)
 
@@ -148,6 +154,7 @@ export const Game = () => {
     if (isPlaying) {
       const hiddenPiece = pieces[pieces.length - 1]
       if (canSwap(piece, hiddenPiece)) {
+        setHintId(-1)
         swap(piece, hiddenPiece)
         setPieces([...pieces])
         setScore(score + 1)

@@ -1,23 +1,7 @@
 import { Vector2d } from "../../../common/vector2d"
 import { useEffect, MouseEvent } from "react"
 import styles from './Board.module.scss'
-
-// export class Piece {
-//   loc: Vector2d;
-//   constructor(loc: Vector2d) {
-//     this.loc = loc;
-//   }
-// }
-export class Piece {
-  startPos: Vector2d;
-  currentPos: Vector2d;
-  index: number;
-  constructor(startPos: Vector2d, index: number) {
-    this.startPos = startPos
-    this.currentPos = startPos
-    this.index = index
-  }
-}
+import { Piece } from "./Piece";
 
 interface IClickFunc {
   (event: MouseEvent<HTMLDivElement>): void
@@ -54,24 +38,26 @@ export const Board = (props: IBoardProps) => {
   const pieceDim = new Vector2d(100 / numPiecesX, 100 / numPiecesY)
   const pieceCount = numPiecesX * numPiecesY
   const piecesR = pieces//range(0, pieceCount)
-    .map((piece, i) => (
-      <div
+    .map((piece, i) => {
+      const x = piece.currentPos.x;
+      const y = piece.currentPos.y;
+      return <div
         key={i}
         className={styles.piece}
         style={{
           width: `${pieceDim.x}%`,
           height: `${pieceDim.y}%`,
-          left: `${piece.currentPos.x * pieceDim.x}%`,
-          top: `${piece.currentPos.y * pieceDim.y}%`,
+          left: `${x * pieceDim.x}%`,
+          top: `${y * pieceDim.y}%`,
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,
           backgroundImage: `url(${imgDataUrl})`,
           backgroundSize: `${100 * numPiecesX}%`,
           backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`,
-          outline: i === hintId ? `1px solid green` : ''
+          outline: x + y * 3 === hintId ? `2px solid green` : ''
         }}
         data-piece-index={i}
       ></div>
-    ))
+    })
   return (
     <div
       className={`${styles.board} ${isPlaying ? styles.playing : ''}`}
