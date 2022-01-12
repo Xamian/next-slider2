@@ -24,6 +24,8 @@
   width: 100vw;
   min-height: 10vw;
   margin-top: 2vw;
+  background-color: var(--button-bg-color);
+  color: var(--button-color);
 }
 @media (min-width: 600px) {
   .game {

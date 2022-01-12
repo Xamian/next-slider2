@@ -17,10 +17,10 @@ export default function Home() {
       </main>
 
       <footer className={styles.footer}>
-        <a
+        &copy; 2020-2022 <a
           href="https://max-it.dk/"
           target="_blank"
-        >max-it.dk</a>&nbsp;- Image from&nbsp;<a href="https://thispersondoesnotexist.com">thispersondoesnotexist.com</a>
+        >max-it.dk</a> - Images from <a href="https://thispersondoesnotexist.com">thispersondoesnotexist.com</a>
       </footer>
     </div>
   )

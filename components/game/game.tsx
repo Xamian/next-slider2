@@ -19,6 +19,7 @@ export const Game = () => {
   const [isPlaying, setIsPlaying] = useState(false)
   const [pieces, setPieces] = useState<Piece[]>(null)
   const [score, setScore] = useState(0)
+  const [hintCount, setHintCount] = useState(0)
   const [message, setMessageText] = useState('Press start to begin')
   const [messageOpacity, setMessageOpacity] = useState(1)
   const [messageHidden, setMessageHidden] = useState(false)
@@ -60,6 +61,7 @@ export const Game = () => {
 
     // if (bestMove > -1) {
     showHint(bestMove)
+    setHintCount(hintCount + 1)
     // } else {
     //   console.log('no best move found!')
     // }
@@ -67,9 +69,9 @@ export const Game = () => {
   const showHint = (index: number) => {
     setHintId(index);
   }
-  const removeHint = () => setHintId(NaN)
   const startGame = async () => {
     setScore(0)
+    setHintCount(0)
     setHintId(-1)
     showMessage('Good luck!')
     setTimeout(() => hideMessage(), 1000)
@@ -166,7 +168,7 @@ export const Game = () => {
     if (isWin(pieces)) {
       const hiddenPiece = pieces[pieces.length - 1]
       // setTimeout(() => hiddenPiece.hidden = false, 1500)
-      showMessage(`Player wins in ${score + 1} moves!`)
+      showMessage(`Player wins in ${score + 1} moves!` + (hintCount > 0 ? ` (${hintCount} hints)` : ''))
       setTimeout(() => setIsPlaying(false), 500)
     }
   }
@@ -199,7 +201,7 @@ export const Game = () => {
 
   return (
     <div className={styles.game}>
-      <div className={styles.score}>{score}</div>
+      {/* <div className={styles.score}>{score}</div> */}
       <div className={styles['board-wrapper']}>
         <Board
           // dimensions={new Vector2d(300, 300)}

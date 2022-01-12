@@ -1,13 +1,30 @@
+:root {
+  --hint-outline-color1: rgba(255, 115, 0, 0);
+  --hint-outline-color2: rgba(255, 185, 128, 0.25);
+  --hint-shadow-color1: rgba(255, 115, 0, 0);
+  --hint-shadow-color2: rgba(255, 115, 0, .3);
+  --button-bg-color: #222222;
+  --button-color: #eeeeee;
+}
+
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
+  background-color: #111111;
+  color: #cccccc;
 }
 
 * {
   box-sizing: border-box;
+}
+
+a:link,
+a:visited,
+a:focus {
+  color: #b9b9ff;
 }
 
 @media (prefers-reduced-motion) {

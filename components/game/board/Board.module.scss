@@ -1,28 +1,54 @@
+@keyframes hint {
+  0% {
+    outline-color: var(--hint-outline-color1);
+    outline-width: 5px;
+    outline-offset: -5px;
+    box-shadow: 0 0px 0px 0px var(--hint-shadow-color1);
+  }
+  50% {
+    outline-color: var(--hint-outline-color2);
+    outline-width: 10px;
+    outline-offset: -10px;
+    box-shadow: 0 0px 5px 2px var(--hint-shadow-color2);
+  }
+  100% {
+    outline-color: var(--hint-outline-color1);
+    outline-width: 5px;
+    outline-offset: -5px;
+    box-shadow: 0 0px 0px 0px var(--hint-shadow-color1);
+  }
+}
+
 .board {
   position: relative;
   // background-color: #ddd;
   width: 100%;
   height: 100%;
+  perspective: 1000px;
   .piece {
     position: absolute;
     background-color: #fff;
     background-repeat: no-repeat;
     background-clip: content-box;
-    transition: padding 1s, border-radius 3s, left 1s cubic-bezier(0.65, 0.05, 0.36, 1),
-      top 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), outline-color 1s;
+    transition: padding 1s, border-radius 1s, left 1s cubic-bezier(0.65, 0.05, 0.36, 1),
+      top 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), outline-color 1s, transform 1s ease-out;
     padding: 0px;
     border-radius: 0%;
     outline: 5px solid rgba(64, 64, 128, 0);
     outline-offset: -5px;
     &.hint {
       outline-width: 5px;
-      outline-color: rgb(64, 179, 255);
+      outline-color: var(--hint-outline-color1);
+      animation-name: hint;
+      animation-duration: 500ms;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease-in-out;
     }
   }
   &.playing {
     .piece {
       border-radius: 10%;
-      padding: 1px;
+      padding: 2px;
     }
   }
 }

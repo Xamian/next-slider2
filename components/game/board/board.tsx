@@ -53,7 +53,8 @@ export const Board = (props: IBoardProps) => {
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,
           backgroundImage: `url(${imgDataUrl})`,
           backgroundSize: `${100 * numPiecesX}%`,
-          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`
+          backgroundPosition: `${(i % numPiecesX) * 100 / (numPiecesX - 1)}% ${Math.floor(i / numPiecesY) * 100 / (numPiecesY - 1)}%`,
+          transform: `rotateY(${360 * x}deg) rotateX(${360 * y}deg)`
         }}
         data-piece-index={i}
       ></div>
