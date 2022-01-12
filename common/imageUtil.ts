@@ -13,3 +13,13 @@ export const dataUrlFromImgUrl = (url: string): Promise<string> => {
     image.src = url
   })
 }
+
+export const cacheImage = (url: string): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => {
+      resolve(url)
+    }
+    image.src = url
+  })
+}

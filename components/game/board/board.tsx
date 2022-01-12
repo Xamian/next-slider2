@@ -32,8 +32,8 @@ export const Board = (props: IBoardProps) => {
     /*, ...rest*/
   } = props;
   const ref = useRef(null);
-  const [width, setWidth] = useState(500);
-  const [height, setHeight] = useState(500);
+  const [width, setWidth] = useState(600);
+  const [height, setHeight] = useState(600);
   useEffect(() => {
 
   }, [imgDataUrl])

@@ -2,7 +2,7 @@ import { Vector2d } from "../../common/vector2d"
 import { Board } from "./board"
 import { Piece } from "./board/Piece"
 import { useState, useRef, SyntheticEvent, useEffect, MouseEvent } from "react"
-import { dataUrlFromImgUrl } from "../../common/imageUtil"
+import { dataUrlFromImgUrl, cacheImage } from "../../common/imageUtil"
 import { range } from "../../common/range"
 import styles from './Game.module.scss'
 import { findBestMove, getSimplifiedBoard } from "../../common/ai"
@@ -39,36 +39,24 @@ export const Game = () => {
     setTimeout(() => setMessageHidden(true), 1000)
   }
 
-  // const imgUrl = 'https://thispersondoesnotexist.com/image'
   const imgUrl = `/api/proxy/thispersondoesnotexist/image?counter=${counter}`
 
   useEffect(() => {
-    dataUrlFromImgUrl(imgUrl).then(dataUrl => setImgDataUrl(dataUrl))
+    cacheImage(imgUrl).then(url => setImgDataUrl(url));
   }, [imgUrl])
 
   const onStartClick = () => {
     startGame()
-    // showMessage('Good luck!')
-    // setTimeout(() => hideMessage(), 1000)
-    // setIsPlaying(true)
   }
   const onHintClick = () => {
-    // const [bestWeight, bestMove] = findBestMove(pieces, W, H);
-    // findBestMove(board: number[]): number
-
     const board = getSimplifiedBoard(pieces);
     const bestMove = findBestMove(board);
-
-    // if (bestMove > -1) {
     showHint(bestMove)
     setHintCount(hintCount + 1)
-    // } else {
-    //   console.log('no best move found!')
-    // }
   }
-  const showHint = (index: number) => {
-    setHintId(index);
-  }
+  const replaceImage = () => setCounter(counter + 1)
+  const onNewImageClick = () => replaceImage()
+  const showHint = (index: number) => setHintId(index);
   const startGame = async () => {
     setScore(0)
     setHintCount(0)
@@ -82,6 +70,7 @@ export const Game = () => {
 
     /// shuffle pieces
     //shufflePieces(25)
+    replaceImage();
     await betterShuffle(W, H)
     // await betterShuffle(numPiecesX, numPiecesY, 1, false, 0)
 
@@ -160,7 +149,8 @@ export const Game = () => {
         swap(piece, hiddenPiece)
         setPieces([...pieces])
         setScore(score + 1)
-        setTimeout(checkWin, 1000);
+        // setTimeout(checkWin, 1000);
+        checkWin();
       }
     }
   }
@@ -220,7 +210,7 @@ export const Game = () => {
       <img src={imgDataUrl} width="200" /> */}
       <button className={styles.button} onClick={onStartClick}>Start</button>
       <button className={styles.button} onClick={onHintClick}>Hint</button>
-      <button className={styles.button} onClick={() => setCounter(counter + 1)}>New Image</button>
+      <button className={styles.button} onClick={onNewImageClick}>New Image</button>
     </div >
   )
 }
