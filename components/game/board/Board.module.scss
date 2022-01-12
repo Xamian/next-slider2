@@ -25,6 +25,7 @@
   width: 100%;
   height: 100%;
   perspective: 1000px;
+  overflow: hidden;
   .piece {
     position: absolute;
     background-color: #fff;
