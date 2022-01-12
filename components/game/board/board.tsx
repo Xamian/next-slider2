@@ -42,7 +42,7 @@ export const Board = (props: IBoardProps) => {
       setWidth(ref.current.parentNode.offsetWidth);
       setHeight(ref.current.parentNode.offsetHeight);
     }
-  }, [ref.current])
+  })
 
   // const pieceDim = new Vector2d(Math.round(100 / numPiecesX), Math.round(100 / numPiecesY))
   // const restX = 100 - pieceDim.x * numPiecesX;
