@@ -1,5 +1,5 @@
 import { Vector2d } from "../../../common/vector2d"
-import { useEffect, MouseEvent } from "react"
+import { useEffect, MouseEvent, useRef, useState } from "react"
 import styles from './Board.module.scss'
 import { Piece } from "./Piece";
 
@@ -31,25 +31,41 @@ export const Board = (props: IBoardProps) => {
     hintId
     /*, ...rest*/
   } = props;
+  const ref = useRef(null);
+  const [width, setWidth] = useState(500);
+  const [height, setHeight] = useState(500);
   useEffect(() => {
 
   }, [imgDataUrl])
+  useEffect(() => {
+    if (ref.current) {
+      setWidth(ref.current.parentNode.offsetWidth);
+      setHeight(ref.current.parentNode.offsetHeight);
+    }
+  }, [ref.current])
 
-  const pieceDim = new Vector2d(100 / numPiecesX, 100 / numPiecesY)
+  // const pieceDim = new Vector2d(Math.round(100 / numPiecesX), Math.round(100 / numPiecesY))
+  // const restX = 100 - pieceDim.x * numPiecesX;
+  // const restY = 100 - pieceDim.y * numPiecesY;
+  const pieceDim = new Vector2d(Math.round(width / numPiecesX), Math.round(height / numPiecesY))
+  const restX = width - pieceDim.x * numPiecesX;
+  const restY = height - pieceDim.y * numPiecesY;
+
   const pieceCount = numPiecesX * numPiecesY
   const piecesR = pieces//range(0, pieceCount)
     .map((piece, i) => {
       const x = piece.currentPos.x;
       const y = piece.currentPos.y;
       return <div
+        ref={ref}
         key={i}
         className={styles.piece +
           (x + y * 3 === hintId ? ` ${styles.hint}` : '')}
         style={{
-          width: `${pieceDim.x}%`,
-          height: `${pieceDim.y}%`,
-          left: `${x * pieceDim.x}%`,
-          top: `${y * pieceDim.y}%`,
+          width: `${pieceDim.x}px`,
+          height: `${pieceDim.y}px`,
+          left: `${Math.round(x * pieceDim.x + restX / 2)}px`,
+          top: `${Math.round(y * pieceDim.y + restY / 2)}px`,
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,
           backgroundImage: `url(${imgDataUrl})`,
           backgroundSize: `${100 * numPiecesX}%`,
