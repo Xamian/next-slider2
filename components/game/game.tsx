@@ -160,7 +160,7 @@ export const Game = () => {
         swap(piece, hiddenPiece)
         setPieces([...pieces])
         setScore(score + 1)
-        checkWin()
+        setTimeout(checkWin, 1000);
       }
     }
   }
