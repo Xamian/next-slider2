@@ -1,7 +1,7 @@
 .game {
   .board-wrapper {
-    width: 100vw;
-    height: 100vw;
+    width: 98vw;
+    height: 98vw;
   }
   .score {
     font-size: large;
@@ -21,7 +21,7 @@
 }
 .button {
   display: block;
-  width: 100vw;
+  width: 100%;
   min-height: 10vw;
   margin-top: 2vw;
   background-color: var(--button-bg-color);
