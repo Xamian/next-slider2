@@ -70,7 +70,7 @@ export const Game = () => {
 
     /// shuffle pieces
     //shufflePieces(25)
-    replaceImage();
+    // replaceImage();
     await betterShuffle(W, H)
     // await betterShuffle(numPiecesX, numPiecesY, 1, false, 0)
 
