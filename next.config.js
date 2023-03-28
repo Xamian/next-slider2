@@ -1,5 +1,7 @@
+/**
+ * @type {import('next').NextConfig}
+ */
 module.exports = {
-  webpack: {},
   async rewrites() {
     return [
       {
