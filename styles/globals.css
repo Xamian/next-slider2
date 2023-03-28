@@ -5,6 +5,8 @@
   --hint-shadow-color2: rgba(255, 115, 0, .3);
   --button-bg-color: #222222;
   --button-color: #eeeeee;
+  --disabled-button-bg-color: #cccccc;
+  --disabled-button-color: #666666;
 }
 
 html,

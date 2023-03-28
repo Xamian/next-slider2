@@ -27,6 +27,10 @@
   background-color: var(--button-bg-color);
   color: var(--button-color);
 }
+.button:disabled {
+  background-color: var(--disabled-button-bg-color);
+  color: var(--disabled-button-color);
+}
 @media (min-width: 600px) {
   .game {
     .board-wrapper {

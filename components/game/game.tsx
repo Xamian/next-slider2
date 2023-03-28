@@ -15,7 +15,7 @@ export const Game = () => {
   const [W, setW] = useState(3)
   const [H, setH] = useState(3)
   const [imgDataUrl, setImgDataUrl] = useState('')
-  const [counter, setCounter] = useState(0)
+  // const [counter, setCounter] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [pieces, setPieces] = useState<Piece[]>(null)
   const [score, setScore] = useState(0)
@@ -39,7 +39,9 @@ export const Game = () => {
     setTimeout(() => setMessageHidden(true), 1000)
   }
 
-  const imgUrl = `/api/proxy/thispersondoesnotexist/image?counter=${counter}`
+  // const imgUrl = `/api/proxy/thispersondoesnotexist/image?counter=${counter}`
+  // const imgUrl = `/download.png`
+  const imgUrl = `/max-stagsted.jpeg`
 
   useEffect(() => {
     cacheImage(imgUrl).then(url => setImgDataUrl(url));
@@ -54,8 +56,8 @@ export const Game = () => {
     showHint(bestMove)
     setHintCount(hintCount + 1)
   }
-  const replaceImage = () => setCounter(counter + 1)
-  const onNewImageClick = () => replaceImage()
+  // const replaceImage = () => setCounter(counter + 1)
+  // const onNewImageClick = () => replaceImage()
   const showHint = (index: number) => setHintId(index);
   const startGame = async () => {
     setScore(0)
@@ -210,7 +212,7 @@ export const Game = () => {
       <img src={imgDataUrl} width="200" /> */}
       <button className={styles.button} onClick={onStartClick}>Start</button>
       <button className={styles.button} onClick={onHintClick}>Hint</button>
-      <button className={styles.button} onClick={onNewImageClick}>New Image</button>
+      <button className={styles.button} disabled title="Sorry, thispersondoesnotexist.com is no longer working for me, you are stuck with the Max for now ;)">New Image</button>
     </div >
   )
 }
