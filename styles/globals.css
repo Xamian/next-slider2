@@ -1,8 +1,8 @@
 :root {
   --hint-outline-color1: rgba(255, 115, 0, 0);
-  --hint-outline-color2: rgba(255, 185, 128, 0.25);
+  --hint-outline-color2: rgba(255, 185, 128, 0.5);
   --hint-shadow-color1: rgba(255, 115, 0, 0);
-  --hint-shadow-color2: rgba(255, 115, 0, .3);
+  --hint-shadow-color2: rgba(255, 115, 0, 0.5);
   --button-bg-color: #222222;
   --button-color: #eeeeee;
   --disabled-button-bg-color: #cccccc;

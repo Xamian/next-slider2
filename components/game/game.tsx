@@ -167,7 +167,7 @@ export const Game = () => {
     if (isWin(pieces)) {
       const hiddenPiece = pieces[pieces.length - 1]
       // setTimeout(() => hiddenPiece.hidden = false, 1500)
-      showMessage(`Player wins in ${score + 1} moves!` + (hintCount > 0 ? ` (${hintCount} hints)` : ''))
+      showMessage(`You win in ${score + 1} moves!` + (hintCount > 0 ? ` (${hintCount} hints)` : ''))
       setTimeout(() => setIsPlaying(false), 500)
     }
   }
