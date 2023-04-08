@@ -8,6 +8,11 @@ import styles from './Game.module.scss'
 import { findBestMove, getSimplifiedBoard } from "../../common/ai"
 import { getPieceAtPos, delay } from "../../common/common"
 
+function createPieces(W: number, H: number) {
+  return range(0, W * H).map(i => (
+    new Piece(new Vector2d(i % W, Math.floor(i / H)), i)
+  ))
+}
 
 export const Game = () => {
   // const canvasRef = useRef(null)
@@ -17,7 +22,7 @@ export const Game = () => {
   const [imgDataUrl, setImgDataUrl] = useState('')
   // const [counter, setCounter] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [pieces, setPieces] = useState<Piece[]>(null)
+  const [pieces, setPieces] = useState<Piece[]>(createPieces(W, H))
   const [score, setScore] = useState(0)
   const [hintCount, setHintCount] = useState(0)
   const [message, setMessageText] = useState('Press start to begin')
@@ -25,15 +30,17 @@ export const Game = () => {
   const [messageHidden, setMessageHidden] = useState(false)
   const [hintId, setHintId] = useState(-1)
   useEffect(() => {
-    setPieces(range(0, W * H).map(i => (
-      new Piece(new Vector2d(i % W, Math.floor(i / H)), i)
-    )))
-  }, [W, H])
+    // setPieces(createPieces(W, H));
+    setTimeout(() => startGame(), 200);
+    // startGame();
+  }, [W, H]);
+
   const showMessage = (text: string) => {
     setMessageText(text)
     setMessageOpacity(1)
     setMessageHidden(false)
   }
+
   const hideMessage = () => {
     setMessageOpacity(0)
     setTimeout(() => setMessageHidden(true), 1000)
@@ -48,13 +55,13 @@ export const Game = () => {
   }, [imgUrl])
 
   const onStartClick = () => {
-    startGame()
+    startGame();
   }
   const onHintClick = () => {
     const board = getSimplifiedBoard(pieces);
     const bestMove = findBestMove(board);
-    showHint(bestMove)
-    setHintCount(hintCount + 1)
+    showHint(bestMove);
+    setHintCount(hintCount + 1);
   }
   // const replaceImage = () => setCounter(counter + 1)
   // const onNewImageClick = () => replaceImage()
@@ -216,3 +223,4 @@ export const Game = () => {
     </div >
   )
 }
+
