@@ -17,5 +17,6 @@
     "**/.env.test.local": true,
     "**/.env.production.local": true,
     "**/.vercel": true
-  }
+  },
+  "sarif-viewer.connectToGithubCodeScanning": "off"
 }
