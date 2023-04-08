@@ -28,6 +28,8 @@
   overflow: hidden;
   .piece {
     position: absolute;
+    width: 33%;
+    aspect-ratio: 1;
     background-color: #fff;
     background-repeat: no-repeat;
     background-clip: content-box;

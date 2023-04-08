@@ -62,8 +62,8 @@ export const Board = (props: IBoardProps) => {
         className={styles.piece +
           (x + y * 3 === hintId ? ` ${styles.hint}` : '')}
         style={{
-          width: `${pieceDim.x}px`,
-          height: `${pieceDim.y}px`,
+          // width: `${pieceDim.x}px`,
+          // height: `${pieceDim.y}px`,
           left: `${Math.round(x * pieceDim.x + restX / 2)}px`,
           top: `${Math.round(y * pieceDim.y + restY / 2)}px`,
           opacity: `${isPlaying && i === pieceCount - 1 ? 0 : 1}`,

@@ -22,7 +22,8 @@
 .button {
   display: block;
   width: 100%;
-  min-height: 10vw;
+  height: 10vw;
+  min-height: 60px;
   margin-top: 2vw;
   background-color: var(--button-bg-color);
   color: var(--button-color);
@@ -43,9 +44,9 @@
       margin-top: -36px;
     }
   }
-  .button {
-    width: 600px;
-    min-height: 60px;
-    margin-top: 10px;
-  }
+  // .button {
+  //   width: 600px;
+  //   min-height: 60px;
+  //   margin-top: 10px;
+  // }
 }
