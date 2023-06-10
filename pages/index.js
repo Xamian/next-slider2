@@ -21,10 +21,6 @@ export default function Home() {
           href="https://max-it.dk/"
           target="_blank"
         >max-it.dk</a> © 2020-2022</div>
-        <div>
-          <p>☹☹️😭 Images used to come from <a href="https://thispersondoesnotexist.com">thispersondoesnotexist.com</a>, but that service is no longer freely available ☹☹️😭.</p>
-          <p>☺️😊🙋 Lucky for us, we have our very own inhouse model ☺️😊🙋.</p>
-        </div>
       </footer>
     </div>
   )

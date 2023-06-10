@@ -48,7 +48,8 @@ export const Game = () => {
 
   // const imgUrl = `/api/proxy/thispersondoesnotexist/image?counter=${counter}`
   // const imgUrl = `/download.png`
-  const imgUrl = `/max-stagsted.jpeg`
+  // const imgUrl = `/max-stagsted.jpeg`
+  const imgUrl = `visax-3aeNUEzWFEk-unsplash_1000x1000.jpg`;
 
   useEffect(() => {
     cacheImage(imgUrl).then(url => setImgDataUrl(url));
@@ -215,12 +216,13 @@ export const Game = () => {
           <div className={styles.message} style={{ opacity: messageOpacity, display: messageHidden ? 'none' : 'block' }}>{message}</div>
         </Board>
       </div>
+      <p>Photo by <a href="https://unsplash.com/it/@visaxslr?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Visax</a> on <a href="https://unsplash.com/t/experimental?utm_source=unsplash&utm_medium=referral&utm_content=creditCopyText">Unsplash</a></p>
       {/* <img src={imgUrl} width="100" />
       <img src={imgDataUrl} width="200" /> */}
       <button className={styles.button} onClick={onStartClick}>Start</button>
       <button className={styles.button} onClick={onHintClick}>Hint</button>
-      <button className={styles.button} disabled title="Sorry, thispersondoesnotexist.com is no longer working for me, you are stuck with the Max for now ;)">New Image</button>
-    </div >
+      {/* <button className={styles.button} disabled title="Sorry, thispersondoesnotexist.com is no longer working for me, you are stuck with the Max for now ;)">New Image</button> */}
+    </div>
   )
 }
 
