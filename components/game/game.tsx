@@ -42,8 +42,11 @@ export const Game = () => {
   }
 
   const hideMessage = () => {
-    setMessageOpacity(0)
-    setTimeout(() => setMessageHidden(true), 1000)
+    setMessageOpacity(0);
+    (async () => {
+      await delay(1000)
+      setMessageHidden(true)
+    })()
   }
 
   // const imgUrl = `/api/proxy/thispersondoesnotexist/image?counter=${counter}`
@@ -70,22 +73,19 @@ export const Game = () => {
   const startGame = async () => {
     setScore(0)
     setHintCount(0)
-    setHintId(-1)
-    showMessage('Good luck!')
-    setTimeout(() => hideMessage(), 1000)
+    setHintId(-1);
+    (async () => {
+      showMessage('Good luck!')
+      await delay(1000)
+      hideMessage()
+    })()
+    // setTimeout(() => hideMessage(), 1000)
 
-    // /// hide the bottom right piece
-    // const hiddenPiece = pieces[pieces.length - 1]
-    // hiddenPiece.hidden = true
-
-    /// shuffle pieces
-    //shufflePieces(25)
-    // replaceImage();
     await betterShuffle(W, H)
-    // await betterShuffle(numPiecesX, numPiecesY, 1, false, 0)
 
     /// make sure the ui is updated
     setPieces([...pieces])
+
     setIsPlaying(true)
   }
 
@@ -144,12 +144,6 @@ export const Game = () => {
     if (!isPlaying || isNaN(pieceIndex))
       return
     pieceClicked(pieces[pieceIndex])
-    // if (canSwap(pieces[pieceIndex], pieces[pieces.length - 1])) {
-    //   swap(pieces[pieceIndex], pieces[pieces.length - 1])
-    //   setPieces([...pieces])
-    //   setScore(score + 1)
-    //   checkWin()
-    // }
   }
   const pieceClicked = (piece: Piece) => {
     if (isPlaying) {
@@ -159,29 +153,22 @@ export const Game = () => {
         swap(piece, hiddenPiece)
         setPieces([...pieces])
         setScore(score + 1)
-        // setTimeout(checkWin, 1000);
         checkWin();
       }
     }
   }
   const checkWin = () => {
     if (isWin(pieces)) {
-      const hiddenPiece = pieces[pieces.length - 1]
-      // setTimeout(() => hiddenPiece.hidden = false, 1500)
       showMessage(`You win in ${score + 1} moves!` + (hintCount > 0 ? ` (${hintCount} hints)` : ''))
       setTimeout(() => setIsPlaying(false), 500)
     }
   }
   const isWin = (pieces: Piece[]) => {
-    for (let i = 0; i < pieces.length; i++) {
-      const piece = pieces[i];
+    return pieces.every(piece => {
       const cPos = piece.currentPos
       const sPos = piece.startPos
-      if (cPos.x != sPos.x || cPos.y != sPos.y) {
-        return false
-      }
-    }
-    return true
+      return (cPos.x == sPos.x && cPos.y == sPos.y)
+    });
   }
 
   const canSwap = (piece: Piece, hiddenPiece: Piece): boolean => {
