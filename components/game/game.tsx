@@ -67,20 +67,15 @@ export const Game = () => {
   const onHintClick = () => {
     const board = getSimplifiedBoard(pieces);
     (async () => {
-      showMessage('Computing hint...')
       const bestMove = await findBestMove(board);
       console.log('bestMove', bestMove, 'board', board);
       if (bestMove == null || bestMove < 0) {
-        showMessage('No hint available');
-        setTimeout(() => hideMessage(), 1000);
         return;
       }
-      showMessage(`Hint: ${bestMove}`)
       showHint(bestMove);
       setHintCount(hintCount + 1);
       // clear the hint after 2 seconds so the user notices it briefly
       setTimeout(() => setHintId(-1), 2000);
-      setTimeout(() => hideMessage(), 1000);
     })();
   }
   // const replaceImage = () => setCounter(counter + 1)
