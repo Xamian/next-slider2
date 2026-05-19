@@ -1,74 +1,88 @@
 import { Piece } from "../components/game/board/Piece";
-import Denque from "denque";
 
-const W = 3;
-const H = 3;
-const positionCount = W * H;
-const emptyPieceIndex = (positionCount - 1).toString(); // '8'
-const winningBoard = [...Array(positionCount)].map((_, k) => k.toString()); // '0','1','2'...,'8'
+const emptyPieceIndex = '8';
 
-class Node {
-  children: Node[];
-  hash: string;
-  constructor(public board: string[], public parent: Node = null) {
-    this.hash = board.join('');
-  }
-}
+let worker = null;
+let prepared = false;
+// pendingRequests maps id -> { resolve: Function, timeout: number }
+let pendingRequests = new Map<string, { resolve: (v: any) => void, timeout: number }>();
+let nextRequestId = 1;
+let preparedResolvers: Array<() => void> = [];
 
-function findLegalMovesFromPos(emptyPos: number): number[] {
-  let legalMoves = []
-  const x = emptyPos % W
-  if (emptyPos > W)
-    legalMoves.push(emptyPos - W)
-  if (x > 0)
-    legalMoves.push(emptyPos - 1)
-  if (x < (W - 1))
-    legalMoves.push(emptyPos + 1)
-  if (emptyPos < 9 - W)
-    legalMoves.push(emptyPos + W)
-  return legalMoves
-}
-function findLegalMoves(board: string[]): number[] {
-  const emptyPos = board.indexOf(emptyPieceIndex)
-  return findLegalMovesFromPos(emptyPos)
-}
-
-function move(board: string[], aMove: number): string[] {
-  const newBoard = board.slice();
-  const emptyPos = newBoard.indexOf(emptyPieceIndex)
-  newBoard[emptyPos] = board[aMove]
-  newBoard[aMove] = emptyPieceIndex
-  return newBoard
-}
-
-const nodeCache = new Map<string, Node>();
-
-function prepare() {
-  const work = new Denque<Node>();
-  work.push(new Node(winningBoard));
-
-  while (work.length > 0) {
-    const node = work.shift();
-    const hash = node.hash;
-    if (!nodeCache.has(hash)) {
-      const legalMoves = findLegalMoves(node.board);
-      const positions = legalMoves.map(aMove => move(node.board, aMove));
-      node.children = positions.map(position => new Node(position, node));
-      node.children.forEach(child => {
-        work.push(child);
-      });
-      nodeCache.set(hash, node);
+function ensureWorker() {
+  if (typeof window === 'undefined') return null;
+  if (!worker) {
+    try {
+      worker = new Worker('/ai-worker.js');
+      worker.onmessage = (e) => {
+        const {type, id, move, board} = e.data || {};
+        if (type === 'prepared') {
+          prepared = true;
+          // resolve any waiters
+          preparedResolvers.forEach(r => r());
+          preparedResolvers = [];
+          console.log('AI worker prepared');
+        } else if (type === 'bestMove') {
+          const entry = pendingRequests.get(id);
+          if (entry) {
+            try { window.clearTimeout(entry.timeout); } catch (e) {}
+            entry.resolve(move);
+            pendingRequests.delete(id);
+          }
+        }
+      };
+    } catch (err) {
+      worker = null;
     }
   }
+  return worker;
 }
 
-export function findBestMove(board: string): number {
-  // console.time()
-  prepare();
-  // console.timeEnd()
-  const hash = board;
-  const node = nodeCache.get(hash);
-  return node.parent ? node.parent.board.indexOf(emptyPieceIndex) : -1;
+export function preloadAIWorker() {
+  const w = ensureWorker();
+  if (w) w.postMessage({type: 'prepare'});
+}
+
+export async function findBestMove(board: string): Promise<number> {
+  const w = ensureWorker();
+  if (w) {
+    // if worker isn't prepared yet, wait (with timeout) so we don't get -1 spuriously
+    if (!prepared) {
+      await new Promise<void>((res) => {
+        const to = window.setTimeout(() => {
+          // timeout — resolve so we continue (may still fail)
+          res();
+        }, 6000);
+        preparedResolvers.push(() => {
+          try { window.clearTimeout(to); } catch (e) {}
+          res();
+        });
+      });
+    }
+    const id = (nextRequestId++).toString();
+    const move = await new Promise<number>((resolve) => {
+      // safety timeout in case worker fails to respond
+      const timeout = window.setTimeout(() => {
+        if (pendingRequests.has(id)) {
+          pendingRequests.delete(id);
+          resolve(-1);
+        }
+      }, 30000);
+      pendingRequests.set(id, { resolve, timeout });
+      try {
+        w.postMessage({type: 'findBestMove', id, board});
+      } catch (err) {
+        try { window.clearTimeout(timeout); } catch (e) {}
+        pendingRequests.delete(id);
+        resolve(-1);
+      }
+    });
+    if (move !== -1) return move;
+    // worker couldn't answer (yet) — do not run heavy sync compute on main thread;
+    // return -1 so caller can show 'No hint available' instead of freezing UI.
+    console.log('worker returned -1; not running sync compute on main thread for board', board);
+    return -1;
+  }
 }
 
 export function getSimplifiedBoard(pieces: Piece[]): string {

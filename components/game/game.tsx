@@ -5,7 +5,7 @@ import { useState, useRef, SyntheticEvent, useEffect, MouseEvent } from "react"
 import { dataUrlFromImgUrl, cacheImage } from "../../common/imageUtil"
 import { range } from "../../common/range"
 import styles from './Game.module.scss'
-import { findBestMove, getSimplifiedBoard } from "../../common/ai"
+import { findBestMove, getSimplifiedBoard, preloadAIWorker } from "../../common/ai"
 import { getPieceAtPos, delay } from "../../common/common"
 
 function createPieces(W: number, H: number) {
@@ -32,6 +32,8 @@ export const Game = () => {
   useEffect(() => {
     // setPieces(createPieces(W, H));
     setTimeout(() => startGame(), 200);
+    // start preloading the AI worker so hint is ready fast
+    preloadAIWorker();
     // startGame();
   }, [W, H]);
 
@@ -63,9 +65,22 @@ export const Game = () => {
   }
   const onHintClick = () => {
     const board = getSimplifiedBoard(pieces);
-    const bestMove = findBestMove(board);
-    showHint(bestMove);
-    setHintCount(hintCount + 1);
+    (async () => {
+      showMessage('Computing hint...')
+      const bestMove = await findBestMove(board);
+      console.log('bestMove', bestMove, 'board', board);
+      if (bestMove == null || bestMove < 0) {
+        showMessage('No hint available');
+        setTimeout(() => hideMessage(), 1000);
+        return;
+      }
+      showMessage(`Hint: ${bestMove}`)
+      showHint(bestMove);
+      setHintCount(hintCount + 1);
+      // clear the hint after 2 seconds so the user notices it briefly
+      setTimeout(() => setHintId(-1), 2000);
+      setTimeout(() => hideMessage(), 1000);
+    })();
   }
   // const replaceImage = () => setCounter(counter + 1)
   // const onNewImageClick = () => replaceImage()
