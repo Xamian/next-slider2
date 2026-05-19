@@ -18,5 +18,15 @@
     "**/.env.production.local": true,
     "**/.vercel": true
   },
-  "sarif-viewer.connectToGithubCodeScanning": "off"
+  "sarif-viewer.connectToGithubCodeScanning": "off",
+  "chat.tools.terminal.autoApprove": {
+    "/^node --check public/ai-worker\\.js$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node --check public/ai-worker\\.js && npm run build$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
 }

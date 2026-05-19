@@ -29,11 +29,12 @@ export const Game = () => {
   const [messageOpacity, setMessageOpacity] = useState(1)
   const [messageHidden, setMessageHidden] = useState(false)
   const [hintId, setHintId] = useState(-1)
+  const [workerReady, setWorkerReady] = useState(false)
   useEffect(() => {
     // setPieces(createPieces(W, H));
     setTimeout(() => startGame(), 200);
     // start preloading the AI worker so hint is ready fast
-    preloadAIWorker();
+    preloadAIWorker().then(() => setWorkerReady(true));
     // startGame();
   }, [W, H]);
 
@@ -223,6 +224,9 @@ export const Game = () => {
       <img src={imgDataUrl} width="200" /> */}
       <button className={styles.button} onClick={onStartClick}>Start</button>
       <button className={styles.button} onClick={onHintClick}>Hint</button>
+      <div style={{ marginTop: '0.5rem', color: workerReady ? 'limegreen' : 'orange' }}>
+        {workerReady ? 'Hint engine ready' : 'Hint engine warming...'}
+      </div>
       {/* <button className={styles.button} disabled title="Sorry, thispersondoesnotexist.com is no longer working for me, you are stuck with the Max for now ;)">New Image</button> */}
     </div>
   )

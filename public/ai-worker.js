@@ -40,11 +40,10 @@ const nodeCache = new Map();
 const pendingRequestsByBoard = Object.create(null);
 let preparing = false;
 
-function respondToRequests(hash, node) {
+function respondToRequests(hash, parentHash) {
   const ids = pendingRequestsByBoard[hash];
   if (!ids || !ids.length) return;
-  const parent = node.parent;
-  const moveIndex = parent ? parent.board.indexOf(emptyPieceIndex) : -1;
+  const moveIndex = parentHash ? parentHash.indexOf(emptyPieceIndex) : -1;
   ids.forEach((id) => {
     self.postMessage({ type: 'bestMove', id, board: hash, move: moveIndex });
   });
@@ -62,44 +61,39 @@ function prepare() {
     const node = work[index++];
     const hash = node.hash;
     if (!nodeCache.has(hash)) {
+      const parentHash = node.parent ? node.parent.hash : null;
+      nodeCache.set(hash, parentHash);
+
       const legalMoves = findLegalMoves(node.board);
       const positions = legalMoves.map((aMove) => move(node.board, aMove));
       node.children = positions.map((position) => new Node(position, node));
       node.children.forEach((child) => work.push(child));
-      nodeCache.set(hash, node);
-      respondToRequests(hash, node);
+      respondToRequests(hash, parentHash);
     }
   }
 
   preparing = false;
-
-  // any outstanding requests for invalid boards should still get an answer.
-  for (const boardHash in pendingRequestsByBoard) {
-    const ids = pendingRequestsByBoard[boardHash];
-    ids.forEach((id) => {
-      self.postMessage({ type: 'bestMove', id, board: boardHash, move: -1 });
-    });
-    delete pendingRequestsByBoard[boardHash];
-  }
+  self.postMessage({ type: 'prepared' });
 }
 
 function findBestMove(boardHash) {
-  if (nodeCache.size === 0) prepare();
-  const node = nodeCache.get(boardHash);
-  if (!node) return -1;
-  return node.parent ? node.parent.board.indexOf(emptyPieceIndex) : -1;
+  if (!preparing && nodeCache.size === 0) prepare();
+  const parentHash = nodeCache.get(boardHash);
+  if (!parentHash) return -1;
+  return parentHash.indexOf(emptyPieceIndex);
 }
 
 self.onmessage = function (e) {
   const { type, board, id } = e.data || {};
   if (type === 'prepare') {
     prepare();
-    self.postMessage({ type: 'prepared' });
-  } else if (type === 'findBestMove') {
+    return;
+  }
+
+  if (type === 'findBestMove') {
     if (nodeCache.has(board)) {
-      const node = nodeCache.get(board);
-      const parent = node.parent;
-      const moveIndex = parent ? parent.board.indexOf(emptyPieceIndex) : -1;
+      const parentHash = nodeCache.get(board);
+      const moveIndex = parentHash ? parentHash.indexOf(emptyPieceIndex) : -1;
       self.postMessage({ type: 'bestMove', id, board, move: moveIndex });
       return;
     }

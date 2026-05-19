@@ -38,9 +38,14 @@ function ensureWorker() {
   return worker;
 }
 
-export function preloadAIWorker() {
+export function preloadAIWorker(): Promise<void> {
   const w = ensureWorker();
-  if (w) w.postMessage({type: 'prepare'});
+  if (!w) return Promise.resolve();
+  if (prepared) return Promise.resolve();
+  w.postMessage({type: 'prepare'});
+  return new Promise<void>((resolve) => {
+    preparedResolvers.push(resolve);
+  });
 }
 
 export async function findBestMove(board: string): Promise<number> {
